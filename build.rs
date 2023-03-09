@@ -7,6 +7,7 @@ const TOP: &str = "top";
 fn main() {
     println!("cargo:rerun-if-changed=src/{TOP}.v");
     println!("cargo:rerun-if-changed=src/v{TOP}_bridge.cpp");
+    println!("cargo:rerun-if-changed=src/verilated_bridge.cpp");
 
     let out_dir_env = std::env::var("OUT_DIR").unwrap();
     let out_dir = Path::new(&out_dir_env);
@@ -51,5 +52,6 @@ fn main() {
         .file(&verilator_include.join("verilated_vcd_c.cpp"))
         .files(&verilated_cpp_files)
         .file(format!("src/v{TOP}_bridge.cpp"))
+        .file(format!("src/verilated_bridge.cpp"))
         .compile("verilated");
 }

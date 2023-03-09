@@ -17,7 +17,7 @@ extern "C" {
     vtop->eval();
   }
 
-  void vtop_finish(Vtop *vtop)
+  void vtop_final(Vtop *vtop)
   {
     vtop->final();
   }

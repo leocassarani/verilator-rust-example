@@ -1,4 +1,5 @@
 mod port;
+mod verilated;
 
 use port::{Port, SinglePort, WidePort};
 
@@ -9,7 +10,7 @@ mod ffi {
         pub fn vtop_new() -> *mut Vtop;
         pub fn vtop_delete(top: *mut Vtop);
         pub fn vtop_eval(top: *mut Vtop);
-        pub fn vtop_finish(top: *mut Vtop);
+        pub fn vtop_final(top: *mut Vtop);
 
         pub fn vtop_port_clk(top: *mut Vtop) -> *mut u8;
         pub fn vtop_port_reset_l(top: *mut Vtop) -> *mut u8;
@@ -58,8 +59,8 @@ impl Top {
         unsafe { ffi::vtop_eval(self.raw) };
     }
 
-    pub fn finish(&mut self) {
-        unsafe { ffi::vtop_finish(self.raw) };
+    pub fn finalize(&mut self) {
+        unsafe { ffi::vtop_final(self.raw) };
     }
 }
 
@@ -78,11 +79,13 @@ fn main() {
     top.in_quad.set(0x1234);
     top.in_wide.set([0x11111111, 0x22222222, 0x3]);
 
-    for time in 0..20 {
+    while !verilated::got_finish() {
         top.clk.toggle();
 
+        verilated::time_inc(1);
+
         if !top.clk.get() {
-            if time < 10 {
+            if verilated::time() > 1 && verilated::time() < 10 {
                 top.reset_l.set(false);
             } else {
                 top.reset_l.set(true);
@@ -94,7 +97,8 @@ fn main() {
         top.eval();
 
         println!(
-            "clk={:x} rstl={:x} iquad={:x} -> oquad={:x} owide={:x}_{:08x}_{:08x}",
+            "[{:x}] clk={:x} rstl={:x} iquad={:x} -> oquad={:x} owide={:x}_{:08x}_{:08x}",
+            verilated::time(),
             top.clk.get() as u8,
             top.reset_l.get() as u8,
             top.in_quad.get(),
@@ -105,5 +109,5 @@ fn main() {
         );
     }
 
-    top.finish();
+    top.finalize();
 }
