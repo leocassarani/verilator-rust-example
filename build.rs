@@ -6,6 +6,7 @@ const TOP: &str = "top";
 
 fn main() {
     println!("cargo:rerun-if-changed=src/{TOP}.v");
+    println!("cargo:rerun-if-changed=src/sub.v");
     println!("cargo:rerun-if-changed=src/v{TOP}_bridge.cpp");
     println!("cargo:rerun-if-changed=src/verilated_bridge.cpp");
 
@@ -19,11 +20,12 @@ fn main() {
         .unwrap();
 
     let status = Command::new("verilator")
-        .arg("-cc")
-        .args(["-Mdir", out_dir.to_str().unwrap()])
+        .arg("--cc")
+        .arg("--trace")
+        .args(["--Mdir", out_dir.to_str().unwrap()])
         .args(["--top-module", TOP])
         .arg(format!("src/{TOP}.v"))
-        .arg(format!("src/sub.v"))
+        .arg("src/sub.v")
         .status()
         .unwrap();
 
@@ -48,10 +50,13 @@ fn main() {
         .cpp(true)
         .include(&verilator_include)
         .include(out_dir)
+        .define("VM_TRACE", "1")
+        .define("VM_TRACE_FST", "0")
+        .define("VM_TRACE_VCD", "1")
         .file(&verilator_include.join("verilated.cpp"))
         .file(&verilator_include.join("verilated_vcd_c.cpp"))
         .files(&verilated_cpp_files)
         .file(format!("src/v{TOP}_bridge.cpp"))
-        .file(format!("src/verilated_bridge.cpp"))
+        .file("src/verilated_bridge.cpp")
         .compile("verilated");
 }

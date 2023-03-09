@@ -13,6 +13,11 @@ extern "C" {
 
   void verilated_time_inc(uint64_t add)
   {
-    return Verilated::timeInc(add);
+    Verilated::timeInc(add);
+  }
+
+  void verilated_trace_ever_on(bool flag)
+  {
+    Verilated::traceEverOn(flag);
   }
 }

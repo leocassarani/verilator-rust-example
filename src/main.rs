@@ -71,6 +71,8 @@ impl Drop for Top {
 }
 
 fn main() {
+    verilated::trace_ever_on(true);
+
     let mut top = Top::new();
 
     top.reset_l.set(true);
