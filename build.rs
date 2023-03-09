@@ -22,6 +22,7 @@ fn main() {
         .args(["-Mdir", out_dir.to_str().unwrap()])
         .args(["--top-module", TOP])
         .arg(format!("src/{TOP}.v"))
+        .arg(format!("src/sub.v"))
         .status()
         .unwrap();
 

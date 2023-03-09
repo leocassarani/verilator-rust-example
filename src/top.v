@@ -27,6 +27,12 @@ module top
    assign out_quad  = ~reset_l ? '0 : (in_quad + 40'b1);
    assign out_wide  = ~reset_l ? '0 : (in_wide + 70'b1);
 
+   // And an example sub module. The submodule will print stuff.
+   sub sub (/*AUTOINST*/
+            // Inputs
+            .clk                        (clk),
+            .reset_l                    (reset_l));
+
    // Print some stuff as an example
    initial begin
       $display("[%0t] Model running...\n", $time);
