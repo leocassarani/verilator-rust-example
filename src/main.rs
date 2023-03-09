@@ -20,6 +20,7 @@ mod ffi {
     }
 }
 
+#[allow(dead_code)]
 pub struct Top {
     raw: *mut ffi::Vtop,
     clk: Port<u8>,
@@ -37,12 +38,12 @@ impl Top {
 
             Top {
                 raw,
-                clk: Port::new(ffi::vtop_port_clk(raw)),
-                reset_l: Port::new(ffi::vtop_port_reset_l(raw)),
-                out_small: Port::new(ffi::vtop_port_out_small(raw)),
-                in_small: Port::new(ffi::vtop_port_in_small(raw)),
-                out_quad: Port::new(ffi::vtop_port_out_quad(raw)),
-                in_quad: Port::new(ffi::vtop_port_in_quad(raw)),
+                clk: Port::new(ffi::vtop_port_clk(raw), 0, 0),
+                reset_l: Port::new(ffi::vtop_port_reset_l(raw), 0, 0),
+                out_small: Port::new(ffi::vtop_port_out_small(raw), 1, 0),
+                in_small: Port::new(ffi::vtop_port_in_small(raw), 1, 0),
+                out_quad: Port::new(ffi::vtop_port_out_quad(raw), 39, 0),
+                in_quad: Port::new(ffi::vtop_port_in_quad(raw), 39, 0),
             }
         }
     }
@@ -71,7 +72,7 @@ fn main() {
     top.in_quad.set(0x1234);
 
     for time in 0..20 {
-        top.clk.set(if top.clk.get() == 0 { 1 } else { 0 });
+        top.clk.set_with(|v| if v == 0 { 1 } else { 0 });
 
         if top.clk.get() == 0 {
             if time < 10 {
@@ -80,7 +81,7 @@ fn main() {
                 top.reset_l.set(1);
             }
 
-            top.in_quad.set(top.in_quad.get() + 0x12);
+            top.in_quad.set_with(|v| v + 0x12);
         }
 
         top.eval();
