@@ -1,3 +1,25 @@
+pub struct SinglePort {
+    raw: *mut u8,
+}
+
+impl SinglePort {
+    pub fn new(raw: *mut u8) -> Self {
+        SinglePort { raw }
+    }
+
+    pub fn get(&self) -> bool {
+        unsafe { *self.raw != 0 }
+    }
+
+    pub fn set(&mut self, v: bool) {
+        unsafe { *self.raw = v as u8 };
+    }
+
+    pub fn toggle(&mut self) {
+        self.set(!self.get());
+    }
+}
+
 pub struct Port<T: num_traits::PrimInt> {
     raw: *mut T,
     mask: T,

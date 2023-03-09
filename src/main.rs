@@ -1,6 +1,6 @@
 mod port;
 
-use port::{Port, WidePort};
+use port::{Port, SinglePort, WidePort};
 
 mod ffi {
     pub enum Vtop {}
@@ -25,8 +25,8 @@ mod ffi {
 #[allow(dead_code)]
 pub struct Top {
     raw: *mut ffi::Vtop,
-    clk: Port<u8>,
-    reset_l: Port<u8>,
+    clk: SinglePort,
+    reset_l: SinglePort,
     out_small: Port<u8>,
     in_small: Port<u8>,
     out_wide: WidePort<3>,
@@ -42,8 +42,8 @@ impl Top {
 
             Top {
                 raw,
-                clk: Port::new(ffi::vtop_port_clk(raw), 0, 0),
-                reset_l: Port::new(ffi::vtop_port_reset_l(raw), 0, 0),
+                clk: SinglePort::new(ffi::vtop_port_clk(raw)),
+                reset_l: SinglePort::new(ffi::vtop_port_reset_l(raw)),
                 out_small: Port::new(ffi::vtop_port_out_small(raw), 1, 0),
                 in_small: Port::new(ffi::vtop_port_in_small(raw), 1, 0),
                 out_wide: WidePort::new(ffi::vtop_port_out_wide(raw), 69, 0),
@@ -72,20 +72,20 @@ impl Drop for Top {
 fn main() {
     let mut top = Top::new();
 
-    top.reset_l.set(1);
-    top.clk.set(0);
+    top.reset_l.set(true);
+    top.clk.set(false);
     top.in_small.set(1);
     top.in_quad.set(0x1234);
     top.in_wide.set([0x11111111, 0x22222222, 0x3]);
 
     for time in 0..20 {
-        top.clk.set_with(|v| if v == 0 { 1 } else { 0 });
+        top.clk.toggle();
 
-        if top.clk.get() == 0 {
+        if !top.clk.get() {
             if time < 10 {
-                top.reset_l.set(0);
+                top.reset_l.set(false);
             } else {
-                top.reset_l.set(1);
+                top.reset_l.set(true);
             }
 
             top.in_quad.set_with(|v| v + 0x12);
@@ -95,8 +95,8 @@ fn main() {
 
         println!(
             "clk={:x} rstl={:x} iquad={:x} -> oquad={:x} owide={:x}_{:08x}_{:08x}",
-            top.clk.get(),
-            top.reset_l.get(),
+            top.clk.get() as u8,
+            top.reset_l.get() as u8,
             top.in_quad.get(),
             top.out_quad.get(),
             top.out_wide.get()[2],
