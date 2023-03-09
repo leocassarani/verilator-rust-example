@@ -42,6 +42,16 @@ extern "C" {
     return &vtop->in_small;
   }
 
+  uint32_t *vtop_port_out_wide(Vtop *vtop)
+  {
+    return vtop->out_wide.data();
+  }
+
+  uint32_t *vtop_port_in_wide(Vtop *vtop)
+  {
+    return vtop->in_wide.data();
+  }
+
   uint64_t *vtop_port_out_quad(Vtop *vtop)
   {
     return &vtop->out_quad;
