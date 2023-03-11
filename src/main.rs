@@ -34,7 +34,7 @@ fn main() {
         top.eval();
 
         println!(
-            "[{:x}] clk={:x} rstl={:x} iquad={:x} -> oquad={:x} owide={:x}_{:08x}_{:08x}",
+            "[{}] clk={:x} rstl={:x} iquad={:x} -> oquad={:x} owide={:x}_{:08x}_{:08x}",
             verilated::time(),
             top.clk.get() as u8,
             top.reset_l.get() as u8,
