@@ -1,6 +1,11 @@
 #include "verilated.h"
 
 extern "C" {
+  void verilated_command_args(int argc, const char **argv)
+  {
+    Verilated::commandArgs(argc, argv);
+  }
+
   bool verilated_got_finish()
   {
     return Verilated::gotFinish();

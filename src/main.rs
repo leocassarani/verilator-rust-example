@@ -6,6 +6,7 @@ use top::Top;
 
 fn main() {
     verilated::trace_ever_on(true);
+    verilated::command_args(std::env::args().collect());
 
     let mut top = Top::new();
 
