@@ -1,7 +1,11 @@
 use crate::port::{Port, SinglePort, WidePort};
 
 mod ffi {
-    pub enum Vtop {}
+    #[repr(C)]
+    pub struct Vtop {
+        _data: [u8; 0],
+        _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
+    }
 
     extern "C" {
         pub fn vtop_new() -> *mut Vtop;
